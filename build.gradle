@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.ypsx.plugin.protox'
-version '202-1.0-SNAPSHOT'
+version '203-1.0-SNAPSHOT'
 
 repositories {
     mavenLocal()
@@ -23,9 +23,9 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2020.2'
+    version '2020.3'
     type = "IU" // 企业版
-    plugins 'idea.plugin.protoeditor:2.1.0','com.intellij.java'
+    plugins 'idea.plugin.protoeditor:2.2.0','com.intellij.java'
 }
 patchPluginXml {
     changeNotes """
