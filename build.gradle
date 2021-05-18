@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.7.3'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    maven { url=uri("https://maven.aliyun.com/repository/public/") }
+    mavenCentral()
+    maven { url=uri("https://plugins.gradle.org/m2/") }
+    maven { url=uri("https://oss.sonatype.org/content/repositories/releases/") }
+    maven { url=uri("https://dl.bintray.com/jetbrains/intellij-plugin-service") }
+    maven { url=uri("https://dl.bintray.com/jetbrains/intellij-third-party-dependencies/") }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version '2021.1'
+    type = "IU" // 企业版
+    plugins 'idea.plugin.protoeditor:2.3.1','com.intellij.java'
+}
+patchPluginXml {
+    changeNotes """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}
+test {
+    useJUnitPlatform()
+}
