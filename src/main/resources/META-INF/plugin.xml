@@ -1,11 +1,11 @@
 <idea-plugin>
-    <id>org.example.plugin-test</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <id>com.ypsx.plugin.protox</id>
+    <name>ProtoX</name>
+    <vendor email="chen_liang@ypshengxian.com" url="http://www.ypsx.com">谊品生鲜</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+   谊品生鲜定制插件ProtoX.配合Ostrich使用更香哦<br>
+    <em>撒花~~~~~~~~~~~~~~</em>
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
