@@ -6,5 +6,5 @@ import javax.swing.*;
 
 public class ProtoIcons {
 
-    public static final Icon FILE = IconLoader.getIcon("/icons/sword.svg");
+    public static final Icon FILE = IconLoader.getIcon("/icons/arrow.svg");
 }
