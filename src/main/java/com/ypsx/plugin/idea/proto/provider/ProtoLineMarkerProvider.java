@@ -27,8 +27,11 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
         Project project = element.getProject();
         List<String> list = JavaUtil.findClassNameList(project);
         List<PsiIdentifier> methods = new ArrayList<>();
-        list.stream().forEach(name -> {
-            Optional<PsiClass> psiClass = JavaUtil.findClass(project, name);
+        for (String s : list) {
+            if (methods.size() > 0){
+                break;
+            }
+            Optional<PsiClass> psiClass = JavaUtil.findClass(project, s);
             psiClass.ifPresent(c -> {
                 Arrays.stream(c.getAnnotations())
                         .filter(annotation -> annotation.getQualifiedName().equals(Constants.OSTRICH_ANNOTATION_NAME))
@@ -40,8 +43,15 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     Arrays.stream(allMethods).filter(method -> method.getName().equals(key)).forEach(m -> methods.add(m.getNameIdentifier()));
                 });
             });
-            //若是按照OstrichService注解未找到 继续根据继承类进行定位
-            if (methods.size() == 0) {
+        }
+
+        //若是按照OstrichService注解未找到 继续根据继承类进行定位
+        if (methods.size() == 0) {
+            for (String s : list) {
+                if (methods.size() > 0){
+                    break;
+                }
+                Optional<PsiClass> psiClass = JavaUtil.findClass(project, s);
                 psiClass.ifPresent(c -> {
                     if (c.getExtendsListTypes().length > 0) {
                         PsiClassType extendsType = c.getExtendsListTypes()[0];
@@ -54,8 +64,8 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     }
                 });
             }
+        }
 
-        });
         if (methods.size() > 0) {
 //            // Add the property to a collection of line marker info
             NavigationGutterIconBuilder<PsiElement> builder =
