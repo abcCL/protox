@@ -12,13 +12,13 @@
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
-    <depends>idea.plugin.protoeditor</depends>
+    <depends>io.protostuff.protostuff-jetbrains-plugin</depends>
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
 <!--        <projectService id="ypsx.member.JavaService" serviceImplementation="com.baomidou.plugin.idea.mybatisx.service.JavaService"/>-->
 
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.ypsx.plugin.idea.proto.provider.OstrichLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="protobuf" implementationClass="com.ypsx.plugin.idea.proto.provider.ProtoLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PROTO" implementationClass="com.ypsx.plugin.idea.proto.provider.ProtoLineMarkerProvider"/>
 
     </extensions>
 

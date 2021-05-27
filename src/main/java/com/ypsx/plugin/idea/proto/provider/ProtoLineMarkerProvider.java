@@ -4,15 +4,12 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiIdentifier;
-import com.intellij.psi.PsiMethod;
+import com.intellij.psi.*;
 import com.ypsx.plugin.idea.proto.Constants;
 import com.ypsx.plugin.idea.proto.ProtoIcons;
 import com.ypsx.plugin.idea.proto.util.JavaUtil;
-import idea.plugin.protoeditor.lang.psi.impl.PbServiceDefinitionImpl;
-import idea.plugin.protoeditor.lang.psi.impl.PbServiceMethodImpl;
+import io.protostuff.jetbrains.plugin.psi.RpcMethodNode;
+import io.protostuff.jetbrains.plugin.psi.ServiceNode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -21,12 +18,12 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
-        if (!(element instanceof PbServiceMethodImpl) || !(element.getParent().getParent() instanceof PbServiceDefinitionImpl)) {
+        if (!(element instanceof RpcMethodNode) || !(element.getParent() instanceof ServiceNode)) {
             return;
         }
-        String key = ((PbServiceMethodImpl) element).getName();
-        PbServiceDefinitionImpl serviceDefinition = (PbServiceDefinitionImpl) (element.getParent().getParent());
-        String definitionName = serviceDefinition.getName();
+        String key = ((RpcMethodNode) element).getMethodName();
+        ServiceNode serviceNode = (ServiceNode) (element.getParent());
+        String definitionName = serviceNode.getName();
         Project project = element.getProject();
         List<String> list = JavaUtil.findClassNameList(project);
         List<PsiIdentifier> methods = new ArrayList<>();
@@ -34,7 +31,7 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Optional<PsiClass> psiClass = JavaUtil.findClass(project, name);
             psiClass.ifPresent(c -> {
                 Arrays.stream(c.getAnnotations())
-                        .filter(annotation -> annotation.getQualifiedName().equals(Constants.ANNOTATION_NAME))
+                        .filter(annotation -> annotation.getQualifiedName().equals(Constants.OSTRICH_ANNOTATION_NAME))
                         .findAny().ifPresent(annotation -> {
                     if (!annotation.findAttributeValue("value").getFirstChild().getText().startsWith(definitionName)) {
                         return;
@@ -43,6 +40,21 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     Arrays.stream(allMethods).filter(method -> method.getName().equals(key)).forEach(m -> methods.add(m.getNameIdentifier()));
                 });
             });
+            //若是按照OstrichService注解未找到 继续根据继承类进行定位
+            if (methods.size() == 0) {
+                psiClass.ifPresent(c -> {
+                    if (c.getExtendsListTypes().length > 0) {
+                        PsiClassType extendsType = c.getExtendsListTypes()[0];
+                        String className = extendsType.getClassName();
+                        if (!className.startsWith(definitionName)) {
+                            return;
+                        }
+                        PsiMethod[] allMethods = c.getMethods();
+                        Arrays.stream(allMethods).filter(method -> method.getName().equals(key)).forEach(m -> methods.add(m.getNameIdentifier()));
+                    }
+                });
+            }
+
         });
         if (methods.size() > 0) {
 //            // Add the property to a collection of line marker info

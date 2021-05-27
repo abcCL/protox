@@ -12,21 +12,11 @@ import com.intellij.psi.impl.java.stubs.impl.PsiMethodStubImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.stubs.StubElement;
-import idea.plugin.protoeditor.lang.PbFileType;
-import idea.plugin.protoeditor.lang.psi.PbFile;
-import idea.plugin.protoeditor.lang.psi.PbServiceBody;
-import idea.plugin.protoeditor.lang.psi.PbServiceMethod;
-import idea.plugin.protoeditor.lang.psi.PbStatement;
-import idea.plugin.protoeditor.lang.psi.impl.PbFileImpl;
-import idea.plugin.protoeditor.lang.psi.impl.PbServiceDefinitionImpl;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.java.generate.element.Element;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class JavaUtil {
 
