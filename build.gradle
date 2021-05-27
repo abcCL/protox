@@ -24,8 +24,8 @@ dependencies {
 apply plugin: 'org.jetbrains.intellij'
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2021.1'
-    type = "IC"
+    version '2020.3'
+    type = "IU"
     plugins 'io.protostuff.protostuff-jetbrains-plugin:0.13.0','com.intellij.java'
 
 }
