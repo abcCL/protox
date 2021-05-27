@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.ypsx.plugin.protox'
-version '2.0-2021.1'
+version '2.0-2019.2'
 
 repositories {
     mavenLocal()
@@ -24,7 +24,7 @@ dependencies {
 apply plugin: 'org.jetbrains.intellij'
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2021.1'
+    version '2019.2'
     type = "IC"
     plugins 'io.protostuff.protostuff-jetbrains-plugin:0.13.0','com.intellij.java'
 

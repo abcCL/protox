@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class OstrichLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
     @Override
-    protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
+    protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo> result) {
         if (!(element instanceof PsiIdentifierImpl)
                 || !(element.getParent() instanceof PsiMethodImpl)
                 || !(element.getParent().getParent() instanceof PsiClassImpl)) {
