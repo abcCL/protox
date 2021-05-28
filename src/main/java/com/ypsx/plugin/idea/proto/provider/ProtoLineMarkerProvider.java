@@ -39,7 +39,7 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     if (!annotation.findAttributeValue("value").getFirstChild().getText().startsWith(definitionName)) {
                         return;
                     }
-                    PsiMethod[] allMethods = c.getAllMethods();
+                    PsiMethod[] allMethods = c.getMethods();
                     Arrays.stream(allMethods).filter(method -> method.getName().equals(key)).forEach(m -> methods.add(m.getNameIdentifier()));
                 });
             });

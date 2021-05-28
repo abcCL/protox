@@ -3,10 +3,8 @@ package com.ypsx.plugin.idea.proto.util;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.file.PsiJavaDirectoryImpl;
 import com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl;
 import com.intellij.psi.impl.java.stubs.impl.PsiMethodStubImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
@@ -34,7 +32,17 @@ public class JavaUtil {
     public static List<String> findClassNameList(Project project) {
         Collection<VirtualFile> virtualFiles =
                 FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project));
-        List<PsiJavaFileImpl> psiJavaFiles = virtualFiles.stream().map(f -> (PsiJavaFileImpl) PsiManager.getInstance(project).findFile(f)).filter(Objects::nonNull).collect(Collectors.toList());
-        return psiJavaFiles.stream().filter(f -> StringUtils.isNotEmpty(f.getPackageName())).map(f -> f.getPackageName() + "." + f.getName().substring(0, f.getName().length() - 5)).collect(Collectors.toList());
+        List<PsiJavaFileImpl> psiJavaFiles = virtualFiles.stream().map(f -> PsiManager.getInstance(project).findFile(f))
+                .filter(f -> f instanceof PsiJavaFileImpl)
+                .map(f->(PsiJavaFileImpl)f)
+                .filter(Objects::nonNull)
+                .filter(f->{
+                    if (f.getContainingDirectory() instanceof PsiJavaDirectoryImpl) {
+                       return !f.getContainingDirectory().toString().contains("/generated-sources");
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+         return psiJavaFiles.stream().filter(f -> StringUtils.isNotEmpty(f.getPackageName())).map(f -> f.getPackageName() + "." + f.getName().substring(0, f.getName().length() - 5)).collect(Collectors.toList());
     }
 }
