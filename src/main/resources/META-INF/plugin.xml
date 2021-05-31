@@ -20,6 +20,9 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.ypsx.plugin.idea.proto.provider.OstrichLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PROTO" implementationClass="com.ypsx.plugin.idea.proto.provider.ProtoLineMarkerProvider"/>
 
+        <gotoSymbolContributor
+                implementation="com.ypsx.plugin.idea.proto.gotosymbol.JavaGoToProtoSymbol"/>
+
     </extensions>
 
     <actions>
