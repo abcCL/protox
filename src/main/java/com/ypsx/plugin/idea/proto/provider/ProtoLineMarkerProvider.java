@@ -8,8 +8,8 @@ import com.intellij.psi.*;
 import com.ypsx.plugin.idea.proto.Constants;
 import com.ypsx.plugin.idea.proto.ProtoIcons;
 import com.ypsx.plugin.idea.proto.util.JavaUtil;
-import io.protostuff.jetbrains.plugin.psi.RpcMethodNode;
-import io.protostuff.jetbrains.plugin.psi.ServiceNode;
+import idea.plugin.protoeditor.lang.psi.PbServiceDefinition;
+import idea.plugin.protoeditor.lang.psi.PbServiceMethod;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -19,7 +19,7 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         JavaLineElementFilter filter = null;
-        if (element instanceof RpcMethodNode) {
+        if (element instanceof PbServiceMethod) {
             filter = new PsiRpcMethodElementFilter();
         }
         if (filter != null) {
@@ -31,9 +31,9 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
         @Override
         protected Collection<? extends PsiElement> getResults(@NotNull PsiElement element) {
-            String key = ((RpcMethodNode) element).getMethodName();
-            ServiceNode serviceNode = (ServiceNode) (element.getParent());
-            String definitionName = serviceNode.getName();
+            String key = ((PbServiceMethod) element).getNameIdentifier().getText();
+            PbServiceDefinition pbServiceDefinition = (PbServiceDefinition)element.getParent().getParent();
+            String definitionName = pbServiceDefinition.getNameIdentifier().getText();
             Project project = element.getProject();
             List<String> list = JavaUtil.findClassNameList(project);
             List<PsiIdentifier> methods = new ArrayList<>();

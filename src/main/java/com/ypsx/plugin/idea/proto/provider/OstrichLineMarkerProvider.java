@@ -9,18 +9,15 @@ import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.psi.impl.source.tree.java.PsiDeclarationStatementImpl;
 import com.intellij.psi.impl.source.tree.java.PsiIdentifierImpl;
-import com.intellij.psi.impl.source.tree.java.PsiMethodCallExpressionImpl;
 import com.ypsx.plugin.idea.proto.Constants;
 import com.ypsx.plugin.idea.proto.ProtoIcons;
 import com.ypsx.plugin.idea.proto.util.ProtoUtil;
-import io.protostuff.jetbrains.plugin.psi.RpcMethodNode;
-import org.apache.commons.collections.CollectionUtils;
+import idea.plugin.protoeditor.lang.psi.PbServiceMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class OstrichLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
@@ -81,7 +78,7 @@ public class OstrichLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 return new ArrayList<>();
             }
 
-            List<RpcMethodNode> methods = ProtoUtil.findPropertiesInProject(project, methodName, className);
+            List<PbServiceMethod> methods = ProtoUtil.findPropertiesInProject(project, methodName, className);
             return methods;
         }
     }

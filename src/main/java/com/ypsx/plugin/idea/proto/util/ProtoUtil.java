@@ -5,11 +5,13 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import io.protostuff.jetbrains.plugin.ProtoFileType;
-import io.protostuff.jetbrains.plugin.psi.ProtoPsiFileRoot;
-import io.protostuff.jetbrains.plugin.psi.ProtoType;
-import io.protostuff.jetbrains.plugin.psi.RpcMethodNode;
-import io.protostuff.jetbrains.plugin.psi.ServiceNode;
+import idea.plugin.protoeditor.lang.PbFileType;
+import idea.plugin.protoeditor.lang.psi.PbFile;
+import idea.plugin.protoeditor.lang.psi.PbServiceBody;
+import idea.plugin.protoeditor.lang.psi.PbServiceMethod;
+import idea.plugin.protoeditor.lang.psi.PbStatement;
+import idea.plugin.protoeditor.lang.psi.impl.PbFileImpl;
+import idea.plugin.protoeditor.lang.psi.impl.PbServiceDefinitionImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,52 +20,87 @@ import java.util.Optional;
 
 public class ProtoUtil {
 
-    public static List<RpcMethodNode> findAllProtoRpcMethod(Project project) {
+    public static List<PbServiceMethod> findAllProtoRpcMethod(Project project) {
         Collection<VirtualFile> virtualFiles = findFilesInAllScope(project);
-        List<RpcMethodNode> results = new ArrayList<>();
+        List<PbServiceMethod> results = new ArrayList<>();
         for (VirtualFile virtualFile : virtualFiles) {
-            ProtoPsiFileRoot protoFile = (ProtoPsiFileRoot) PsiManager.getInstance(project).findFile(virtualFile);
-            Collection<ProtoType> declaredTypes = protoFile.getProtoRoot().getDeclaredTypes();
-            Optional<ProtoType> serviceNode = declaredTypes.stream().filter(protoType -> protoType instanceof ServiceNode).findAny();
-            if (serviceNode.isPresent()) {
-                ServiceNode node = (ServiceNode) serviceNode.get();
-                List<RpcMethodNode> rpcMethods = node.getRpcMethods();
-                results.addAll(rpcMethods);
+            PbFileImpl protoFile = (PbFileImpl) PsiManager.getInstance(project).findFile(virtualFile);
+            if (protoFile != null) {
+                List<PbStatement> statements = protoFile.getStatements();
+                for (PbStatement statement : statements) {
+                    if (statement instanceof PbServiceDefinitionImpl) {
+                        String serviceName = ((PbServiceDefinitionImpl) statement).getName();
+                        PbServiceBody serviceBody = ((PbServiceDefinitionImpl) statement).getBody();
+                        results.addAll(serviceBody.getServiceMethodList());
+                    }
+
+                }
             }
         }
         return results;
     }
 
-    public static List<RpcMethodNode> findPropertiesInProject(Project project, String methodName, String className) {
+    public static List<PbServiceMethod> findProperties(Project project, String methodName) {
+        Collection<VirtualFile> virtualFiles = findFilesInAllScope(project);
+        return findMethodByKey(virtualFiles, project, methodName);
+    }
+
+    private static List<PbServiceMethod> findMethodByKey(Collection<VirtualFile> virtualFiles, Project project, String key) {
+        List<PbServiceMethod> result = new ArrayList<>();
+        for (VirtualFile virtualFile : virtualFiles) {
+            PbFileImpl protoFile = (PbFileImpl) PsiManager.getInstance(project).findFile(virtualFile);
+            if (protoFile != null) {
+                List<PbStatement> statements = protoFile.getStatements();
+                for (PbStatement statement : statements) {
+                    if (statement instanceof PbServiceDefinitionImpl) {
+                        String serviceName = ((PbServiceDefinitionImpl) statement).getName();
+                        PbServiceBody serviceBody = ((PbServiceDefinitionImpl) statement).getBody();
+                        List<PbServiceMethod> methods = serviceBody.getServiceMethodList();
+                        for (PbServiceMethod method : methods) {
+                            if (method.getNameIdentifier().getText().equals(key)) {
+                                result.add(method);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<PbServiceMethod> findPropertiesInProject(Project project, String methodName, String className) {
         Collection<VirtualFile> virtualFiles = findFilesInProject(project);
         return findMethod(virtualFiles, project, methodName, className);
     }
 
-    private static List<RpcMethodNode> findMethod(Collection<VirtualFile> virtualFiles, Project project, String methodName, String className) {
-        List<RpcMethodNode> result = new ArrayList<>();
+    private static List<PbServiceMethod> findMethod(Collection<VirtualFile> virtualFiles, Project project, String methodName, String className) {
+        List<PbServiceMethod> result = new ArrayList<>();
         for (VirtualFile virtualFile : virtualFiles) {
-            ProtoPsiFileRoot protoFile = (ProtoPsiFileRoot) PsiManager.getInstance(project).findFile(virtualFile);
-            Collection<ProtoType> declaredTypes = protoFile.getProtoRoot().getDeclaredTypes();
-            Optional<ProtoType> serviceNode = declaredTypes.stream().filter(protoType -> protoType instanceof ServiceNode).findAny();
-            if (serviceNode.isPresent()) {
-                ServiceNode node = (ServiceNode) serviceNode.get();
-                List<RpcMethodNode> rpcMethods = node.getRpcMethods();
-                for (RpcMethodNode methodNode : rpcMethods) {
-                    if (methodNode.getMethodName().equals(methodName) && className.startsWith(node.getName())) {
-                        result.add(methodNode);
+            PbFileImpl protoFile = (PbFileImpl) PsiManager.getInstance(project).findFile(virtualFile);
+            if (protoFile != null) {
+                List<PbStatement> statements = protoFile.getStatements();
+                for (PbStatement statement : statements) {
+                    if (statement instanceof PbServiceDefinitionImpl) {
+                        String serviceName = ((PbServiceDefinitionImpl) statement).getName();
+                        PbServiceBody serviceBody = ((PbServiceDefinitionImpl) statement).getBody();
+                        List<PbServiceMethod> methods = serviceBody.getServiceMethodList();
+                        for (PbServiceMethod method : methods) {
+                            if (method.getNameIdentifier().getText().equals(methodName) && className.startsWith(serviceName)) {
+                                result.add(method);
+                            }
+                        }
                     }
                 }
-                rpcMethods.stream().filter(method -> method.getMethodName().equals(methodName)).findAny();
             }
         }
         return result;
     }
 
     public static <T> Collection<T> findFilesInProject(Project project) {
-        return (Collection<T>) FileTypeIndex.getFiles(ProtoFileType.INSTANCE, GlobalSearchScope.projectScope(project));
+        return (Collection<T>) FileTypeIndex.getFiles(PbFileType.INSTANCE, GlobalSearchScope.projectScope(project));
     }
 
     public static <T> Collection<T> findFilesInAllScope(Project project) {
-        return (Collection<T>) FileTypeIndex.getFiles(ProtoFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        return (Collection<T>) FileTypeIndex.getFiles(PbFileType.INSTANCE, GlobalSearchScope.allScope(project));
     }
 }
