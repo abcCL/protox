@@ -15,9 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
+
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo> result) {
-        if (!(element instanceof RpcMethodNode) || !(element.getParent() instanceof ServiceNode)) {
+         if (!(element instanceof RpcMethodNode) || !(element.getParent() instanceof ServiceNode)) {
             return;
         }
         String key = ((RpcMethodNode) element).getMethodName();
@@ -27,9 +28,6 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
         List<String> list = JavaUtil.findClassNameList(project);
         List<PsiIdentifier> methods = new ArrayList<>();
         for (String s : list) {
-            if (methods.size() > 0) {
-                break;
-            }
             Optional<PsiClass> psiClass = JavaUtil.findClass(project, s);
             psiClass.ifPresent(c -> {
                 Arrays.stream(c.getAnnotations())
@@ -47,7 +45,7 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
         //若是按照OstrichService注解未找到 继续根据继承类进行定位
         if (methods.size() == 0) {
             for (String s : list) {
-                if (methods.size() > 0) {
+                if (methods.size() > 0){
                     break;
                 }
                 Optional<PsiClass> psiClass = JavaUtil.findClass(project, s);
