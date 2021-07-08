@@ -28,9 +28,6 @@ public class ProtoLineMarkerProvider extends RelatedItemLineMarkerProvider {
         List<String> list = JavaUtil.findClassNameList(project);
         List<PsiIdentifier> methods = new ArrayList<>();
         for (String s : list) {
-            if (methods.size() > 0){
-                break;
-            }
             Optional<PsiClass> psiClass = JavaUtil.findClass(project, s);
             psiClass.ifPresent(c -> {
                 Arrays.stream(c.getAnnotations())
