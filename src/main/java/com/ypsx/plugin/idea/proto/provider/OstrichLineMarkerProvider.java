@@ -35,26 +35,27 @@ public class OstrichLineMarkerProvider extends RelatedItemLineMarkerProvider {
         if (!annotationNames.contains(Constants.OSTRICH_ANNOTATION_NAME) && !annotationNames.contains(Constants.GRPC_ANNOTATION_NAME)) {
             return;
         }
-        String className = "";
+        String classFullName = "";
         Project project = element.getProject();
         String methodName = element.getText();
         if (psiClass.getExtendsListTypes().length > 0) {
             PsiClassType referencedType = psiClass.getExtendsListTypes()[0];
-            className = referencedType.getClassName();
+//            referencedType.getName()
+            classFullName = referencedType.getClassName();
         }
-        Optional<String> annoClassName = Arrays.stream(annotations).filter(annotation -> annotation.getQualifiedName().equals(Constants.OSTRICH_ANNOTATION_NAME))
+        Optional<String> annoClassFullName = Arrays.stream(annotations).filter(annotation -> annotation.getQualifiedName().equals(Constants.OSTRICH_ANNOTATION_NAME))
                 .map(annotation ->
-                        annotation.findAttributeValue("value").getFirstChild().getText())
+                                annotation.findAttributeValue("value").getFirstChild().getFirstChild().getReference().getCanonicalText())
                 .findFirst();
         //优先根据注解里的value赋值
-        if (annoClassName.isPresent()) {
-            className = annoClassName.get();
+        if (annoClassFullName.isPresent()) {
+            classFullName = annoClassFullName.get();
         }
-        if (StringUtils.isBlank(className)) {
+        if (StringUtils.isBlank(classFullName)) {
             return;
         }
 
-        List<RpcMethodNode> methods = ProtoUtil.findProperties(project, methodName, className);
+        List<RpcMethodNode> methods = ProtoUtil.findProperties(project, methodName, classFullName);
         if (methods.size() > 0) {
             // Add the property to a collection of line marker info
             NavigationGutterIconBuilder<PsiElement> builder =
