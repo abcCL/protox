@@ -41,7 +41,7 @@ public class OstrichLineMarkerProvider extends RelatedItemLineMarkerProvider {
         if (psiClass.getExtendsListTypes().length > 0) {
             PsiClassType referencedType = psiClass.getExtendsListTypes()[0];
 //            referencedType.getName()
-            classFullName = referencedType.getClassName();
+            classFullName = referencedType.getCanonicalText();
         }
         Optional<String> annoClassFullName = Arrays.stream(annotations).filter(annotation -> annotation.getQualifiedName().equals(Constants.OSTRICH_ANNOTATION_NAME))
                 .map(annotation ->
